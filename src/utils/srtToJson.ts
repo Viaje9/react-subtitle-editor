@@ -1,16 +1,11 @@
-export interface Subtitle {
-  number: number;
-  startTime: string;
-  endTime: string;
-  text: string;
-}
+import { Subtitle } from "@/models/subtitle";
 
-export function srtToJson(srt: string):Subtitle[] {
+export function srtToJson(srt: string): Subtitle[] {
   // Split SRT text into individual subtitle blocks
   const subtitleBlocks = srt.trim().split("\n\n");
 
   // Create an array to store the converted JSON objects
-  const subtitles:Subtitle[] = [];
+  const subtitles: Subtitle[] = [];
 
   // Loop through each subtitle block
   for (let i = 0; i < subtitleBlocks.length; i++) {
