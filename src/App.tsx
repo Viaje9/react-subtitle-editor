@@ -1,8 +1,39 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { srtToJson } from "@/utils/srtToJson";
+import VideoComponent from "./views/video/video.component";
+
 
 function App() {
   const [count, setCount] = useState(0);
+
+  const playerRef = React.useRef(null);
+
+  const videoJsOptions = {
+    autoplay: true,
+    controls: true,
+    responsive: true,
+    fluid: true,
+    techOrder: ["youtube"],
+    sources: [
+      {
+        type: "video/youtube",
+        src: "https://www.youtube.com/watch?v=BdHaeczStRA",
+      },
+    ],
+  };
+
+  const handlePlayerReady = (player: any) => {
+    playerRef.current = player;
+
+    // You can handle player events here, for example:
+    player.on("waiting", () => {
+      console.log("player is waiting");
+    });
+
+    player.on("dispose", () => {
+      console.log("player will dispose");
+    });
+  };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     // Set the selected file to state
@@ -24,6 +55,10 @@ function App() {
 
   return (
     <div className="App">
+      <VideoComponent
+        options={videoJsOptions}
+        onReady={handlePlayerReady}
+      ></VideoComponent>
       {/* <iframe
         width="560"
         height="315"
