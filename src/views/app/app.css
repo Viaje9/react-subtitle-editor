@@ -1,0 +1,10 @@
+.App {
+  display: grid;
+  grid-template-columns: auto 300px;
+  grid-template-rows: 1fr;
+}
+
+.bottom {
+  grid-column-start: 1;
+  grid-column-end: 2;
+}

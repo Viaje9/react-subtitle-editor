@@ -4,6 +4,7 @@ import "video.js/dist/video-js.css";
 import "@videojs/http-streaming";
 import "videojs-youtube/dist/Youtube.min.js";
 import './video.css';
+import MeasureHeight from "@/components/ measure-height.component";
 
 
 const VideoJS: React.FC = () => {
@@ -11,7 +12,7 @@ const VideoJS: React.FC = () => {
   const playerRef = useRef<any>();
 
   const options: videojs.PlayerOptions = {
-    autoplay: true,
+    autoplay: false,
     controls: true,
     responsive: true,
     fluid: true,
@@ -25,6 +26,11 @@ const VideoJS: React.FC = () => {
   };
 
   useEffect(() => {
+    if (videoRef.current) {
+      console.log(videoRef.current.clientHeight);
+
+    }
+
     if (!playerRef.current) {
       const videoElement = document.createElement("video");
       videoElement.classList.add("video-js", "vjs-big-play-centered");
@@ -55,7 +61,9 @@ const VideoJS: React.FC = () => {
 
   return (
     <div className="video-component" data-vjs-player>
-      <div ref={videoRef} />
+      <MeasureHeight>
+        <div ref={videoRef} />
+      </MeasureHeight>
     </div>
   );
 };
