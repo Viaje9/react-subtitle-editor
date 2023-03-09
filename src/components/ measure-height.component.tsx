@@ -1,7 +1,4 @@
-import { setVideoHeight } from '@/store/app/action';
-import React, { useRef, useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../store';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 
 interface Props {
   children: React.ReactNode;
@@ -12,7 +9,7 @@ const MeasureHeight: React.FC<Props> = ({ children, onHeightChange }) => {
   const [height, setHeight] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
 
-  const handleResize = () => {
+  const uesHandleResize = useCallback(() => {
     if (ref.current) {
       const newHeight = ref.current.offsetHeight;
       if (newHeight !== height) {
@@ -20,17 +17,17 @@ const MeasureHeight: React.FC<Props> = ({ children, onHeightChange }) => {
         if (onHeightChange) {
           onHeightChange(newHeight);
         }
-     
+
       }
     }
-  };
+  }, [height, onHeightChange]);
 
   useEffect(() => {
-    window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', uesHandleResize);
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('resize', uesHandleResize);
     };
-  }, []);
+  }, [uesHandleResize]);
 
   return (
     <div ref={ref}>

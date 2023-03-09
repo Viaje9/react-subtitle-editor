@@ -15,14 +15,11 @@ export function UploadComponent() {
 
   const handleFileInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
-      var file = event.target.files[0];
+      const file = event.target.files[0];
       const reader = new FileReader();
       reader.addEventListener("load", (e) => {
-
         if (typeof e.target?.result === "string") {
-          const subtitleList = srtToJson(e.target?.result);
-          console.log(subtitleList);
-          
+          const subtitleList = srtToJson(e.target?.result);          
           dispatch(initSubtitle({ subtitleList }))
         } else {
           alert('請傳入srt格式')
@@ -32,6 +29,7 @@ export function UploadComponent() {
       reader.readAsText(file);
     }
   };
+  
   return <>
     <Button onClick={handleClick} variant="success">上傳</Button>
     <input

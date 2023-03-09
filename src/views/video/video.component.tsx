@@ -5,8 +5,8 @@ import "@videojs/http-streaming";
 import "videojs-youtube/dist/Youtube.min.js";
 import './video.css';
 import MeasureHeight from "@/components/ measure-height.component";
-import { useDispatch, useSelector } from "react-redux";
-import { setVideoHeight } from "@/store/app/action";
+import { useDispatch } from "react-redux";
+import { setCurrentTime, setVideoHeight } from "@/store/app/action";
 
 
 const VideoJS: React.FC = () => {
@@ -37,7 +37,7 @@ const VideoJS: React.FC = () => {
         videoRef.current.appendChild(videoElement);
       }
 
-      const player = (playerRef.current = videojs(videoElement, options, () => {
+      (playerRef.current = videojs(videoElement, options, () => {
         if (videoRef.current) {
           dispatch(setVideoHeight(videoRef.current.offsetHeight))
         }
@@ -66,7 +66,7 @@ const VideoJS: React.FC = () => {
       const currentTime = playerRef.current.currentTime();
 
       if (typeof currentTime === "number" && !isNaN(currentTime)) {
-        console.log(currentTime.toFixed(3));
+        dispatch(setCurrentTime(currentTime.toFixed(3)))
       }
     }
   };
@@ -85,7 +85,7 @@ const VideoJS: React.FC = () => {
 
   return (
     <div className="video-component" data-vjs-player>
-      <MeasureHeight onHeightChange={(height: number) => {
+      <MeasureHeight onHeightChange={(height: number) => {        
         dispatch(setVideoHeight(height))
       }}>
         <div ref={videoRef} />
