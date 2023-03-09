@@ -5,18 +5,22 @@ import { RootState } from '../store';
 
 interface Props {
   children: React.ReactNode;
+  onHeightChange?: (height: number) => void;
 }
 
-const MeasureHeight: React.FC<Props> = ({ children }) => {
-  const videoHeight = useSelector((state: RootState) => state.app.videoHeight);
-  const dispatch = useDispatch()
+const MeasureHeight: React.FC<Props> = ({ children, onHeightChange }) => {
+  const [height, setHeight] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
 
   const handleResize = () => {
     if (ref.current) {
       const newHeight = ref.current.offsetHeight;
-      if (newHeight !== videoHeight) {
-        dispatch(setVideoHeight(newHeight))
+      if (newHeight !== height) {
+        setHeight(newHeight);
+        if (onHeightChange) {
+          onHeightChange(newHeight);
+        }
+     
       }
     }
   };

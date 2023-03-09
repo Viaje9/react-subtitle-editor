@@ -5,11 +5,14 @@ import "@videojs/http-streaming";
 import "videojs-youtube/dist/Youtube.min.js";
 import './video.css';
 import MeasureHeight from "@/components/ measure-height.component";
+import { useDispatch, useSelector } from "react-redux";
+import { setVideoHeight } from "@/store/app/action";
 
 
 const VideoJS: React.FC = () => {
   const videoRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<any>();
+  const dispatch = useDispatch()
 
   const options: videojs.PlayerOptions = {
     autoplay: false,
@@ -26,11 +29,6 @@ const VideoJS: React.FC = () => {
   };
 
   useEffect(() => {
-    if (videoRef.current) {
-      console.log(videoRef.current.clientHeight);
-
-    }
-
     if (!playerRef.current) {
       const videoElement = document.createElement("video");
       videoElement.classList.add("video-js", "vjs-big-play-centered");
@@ -40,8 +38,12 @@ const VideoJS: React.FC = () => {
       }
 
       const player = (playerRef.current = videojs(videoElement, options, () => {
+        if (videoRef.current) {
+          dispatch(setVideoHeight(videoRef.current.offsetHeight))
+        }
         console.log("player is ready");
       }));
+
     } else {
       const player = playerRef.current;
       player.autoplay(options.autoplay);
@@ -59,9 +61,33 @@ const VideoJS: React.FC = () => {
     };
   }, []);
 
+  const handleTimeUpdate = () => {
+    if (playerRef.current) {
+      const currentTime = playerRef.current.currentTime();
+
+      if (typeof currentTime === "number" && !isNaN(currentTime)) {
+        console.log(currentTime.toFixed(3));
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (playerRef.current) {
+      playerRef.current.on('timeupdate', handleTimeUpdate);
+    }
+
+    return () => {
+      if (playerRef.current) {
+        playerRef.current.off('timeupdate', handleTimeUpdate);
+      }
+    };
+  }, []);
+
   return (
     <div className="video-component" data-vjs-player>
-      <MeasureHeight>
+      <MeasureHeight onHeightChange={(height: number) => {
+        dispatch(setVideoHeight(height))
+      }}>
         <div ref={videoRef} />
       </MeasureHeight>
     </div>
