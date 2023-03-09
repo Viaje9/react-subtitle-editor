@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 import { initSubtitle } from "@/store/app/action";
 
 function App() {
-  const dispatch = useDispatch()
+  // const dispatch = useDispatch()
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     // Set the selected file to state
     if (event.target.files && event.target.files.length > 0) {
@@ -16,7 +16,7 @@ function App() {
 
         if (typeof e.target?.result === "string") {
           const subtitleList = srtToJson(e.target?.result);
-          dispatch(initSubtitle({ subtitleList }))
+          // dispatch(initSubtitle({ subtitleList }))
         } else {
           alert('請傳入srt')
         }
