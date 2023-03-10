@@ -19,7 +19,7 @@ export function UploadComponent() {
       const reader = new FileReader();
       reader.addEventListener("load", (e) => {
         if (typeof e.target?.result === "string") {
-          const subtitleList = srtToJson(e.target?.result);          
+          const subtitleList = srtToJson(e.target.result);
           dispatch(initSubtitle({ subtitleList }))
         } else {
           alert('請傳入srt格式')
