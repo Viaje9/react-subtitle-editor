@@ -10,3 +10,8 @@
 .subtitleItem {
   min-height: 65px;
 }
+
+
+.timeInput {
+  width: 200px;
+}

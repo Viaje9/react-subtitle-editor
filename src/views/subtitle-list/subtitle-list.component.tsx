@@ -1,11 +1,10 @@
 import { Subtitle } from "@/models/subtitle";
 import { RootState } from "@/store";
+import { convertTimeToSeconds } from "@/utils/time-helper";
 import { ChangeEvent, useState } from "react";
 import { Button, Card, Form, InputGroup, ListGroup } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import './subtitle-list.css'
-
-
 
 export function SubtitleListComponent() {
   const { subtitleList, currentSubtitle, videoHeight } = useSelector((state: RootState) => state.app);
@@ -65,6 +64,14 @@ function SubtitleItem({ subtitle, currentNumber }: SubtitleItemProps) {
           })()
         }
       </Button>
+      <InputGroup className="timeInput p-1 me-1">
+        <InputGroup.Text className="p-1">Start</InputGroup.Text>
+        <Form.Control className="p-1" disabled={buttonStatus === Status.CONFIRM} type="number" step="0.1" defaultValue={convertTimeToSeconds(subtitle.startTime)} />
+      </InputGroup>
+      <InputGroup className="timeInput p-1 me-1">
+        <InputGroup.Text className="p-1">End</InputGroup.Text>
+        <Form.Control className="p-1" disabled={buttonStatus === Status.CONFIRM} type="number" step="0.1" defaultValue={convertTimeToSeconds(subtitle.startTime)} />
+      </InputGroup>
       <InputGroup>
         <Form.Control disabled={buttonStatus === Status.CONFIRM} value={text} onChange={onSubtitleChange} />
       </InputGroup>

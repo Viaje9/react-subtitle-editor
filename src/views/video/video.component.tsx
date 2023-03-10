@@ -8,7 +8,7 @@ import MeasureHeight from "@/components/ measure-height.component";
 import { useDispatch, useStore } from "react-redux";
 import { setCurrentSubtitle, setCurrentTime, setVideoHeight } from "@/store/app/action";
 import { RootState } from "@/store";
-import { convertTimeToSeconds } from "@/utils/convertTimeToSeconds";
+import { convertTimeToSeconds } from "@/utils/time-helper";
 
 
 const VideoJS: React.FC = () => {
