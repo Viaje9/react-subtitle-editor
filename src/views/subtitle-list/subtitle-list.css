@@ -1,3 +1,12 @@
 .subtitleList {
+
+}
+
+.subtitleGroup {
+  max-height: 300px;
   overflow-y: scroll;
+}
+
+.subtitleItem {
+  min-height: 65px;
 }

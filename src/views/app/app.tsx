@@ -5,16 +5,15 @@ import { SubtitleListComponent } from "../subtitle-list/subtitle-list.component"
 import { EditorSubtitleComponent } from "../editor-subtitle/editor-subtitle.component";
 
 function App() {
-
   return (
-    <div>
-      <div className="App">
+    <div className="app">
+      <div className="videoContainer">
         <VideoComponent></VideoComponent>
-        <SubtitleListComponent></SubtitleListComponent>
       </div>
       <div className="bottom">
-        <EditorSubtitleComponent></EditorSubtitleComponent>
+        <SubtitleListComponent></SubtitleListComponent>
         <UploadComponent></UploadComponent>
+        {/* <EditorSubtitleComponent></EditorSubtitleComponent> */}
       </div>
     </div>
   );

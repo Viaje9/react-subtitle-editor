@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useCallback } from "react";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
 import "@videojs/http-streaming";
@@ -17,21 +17,23 @@ const VideoJS: React.FC = () => {
   const store = useStore<RootState>()
   const dispatch = useDispatch()
 
-  const options: videojs.PlayerOptions = {
-    autoplay: false,
-    controls: true,
-    responsive: true,
-    fluid: true,
-    techOrder: ["youtube"],
-    sources: [
-      {
-        type: "video/youtube",
-        src: "https://www.youtube.com/watch?v=BdHaeczStRA",
-      },
-    ],
-  };
+
 
   useEffect(() => {
+    const options: videojs.PlayerOptions = {
+      autoplay: false,
+      controls: true,
+      responsive: true,
+      fluid: true,
+      techOrder: ["youtube"],
+      sources: [
+        {
+          type: "video/youtube",
+          src: "https://www.youtube.com/watch?v=BdHaeczStRA",
+        },
+      ],
+    };
+
     if (!playerRef.current) {
       const videoElement = document.createElement("video");
       videoElement.classList.add("video-js", "vjs-big-play-centered");
@@ -52,7 +54,7 @@ const VideoJS: React.FC = () => {
       player.autoplay(options.autoplay);
       player.src(options.sources);
     }
-  }, [options, videoRef]);
+  }, [videoRef, dispatch]);
 
   useEffect(() => {
     return () => {
@@ -64,7 +66,7 @@ const VideoJS: React.FC = () => {
     };
   }, []);
 
-  const handleTimeUpdate = () => {
+  const handleTimeUpdate = useCallback(() => {
     if (playerRef.current) {
       const currentTime = playerRef.current.currentTime();
 
@@ -86,7 +88,7 @@ const VideoJS: React.FC = () => {
         dispatch(setCurrentTime(currentTime.toFixed(3)))
       }
     }
-  };
+  }, [dispatch, store])
 
   useEffect(() => {
     if (playerRef.current) {
@@ -98,7 +100,7 @@ const VideoJS: React.FC = () => {
         playerRef.current.off('timeupdate', handleTimeUpdate);
       }
     };
-  }, []);
+  }, [handleTimeUpdate]);
 
   return (
     <div className="video-component" data-vjs-player>
