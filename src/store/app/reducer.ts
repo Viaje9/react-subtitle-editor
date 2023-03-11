@@ -31,10 +31,12 @@ export const AppReducer = createReducer(initialState, (builder) => {
     state.currentSubtitle = action.payload
   })
   builder.addCase(editorSubtitle, (state, action: PayloadAction<Subtitle>) => {
-    state.subtitleList = state.subtitleList
+    const newList = state.subtitleList
       .map(subtitle => (subtitle.number === action.payload.number ? { ...action.payload } : subtitle))
       .sort((a, b) => convertTimeToSeconds(a.startTime) - convertTimeToSeconds(b.startTime))
       .map((subtitle, i) => ({ ...subtitle, number: i + 1 }))
+
+    state.subtitleList = newList
 
   })
   builder.addDefaultCase(() => ({ ...initialState }));
