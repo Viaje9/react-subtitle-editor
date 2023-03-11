@@ -4,7 +4,7 @@ import "video.js/dist/video-js.css";
 import "@videojs/http-streaming";
 import "videojs-youtube/dist/Youtube.min.js";
 import './video.css';
-import MeasureHeight from "@/components/ measure-height.component";
+import MeasureSize from "@/components/ measure-size.component";
 import { useDispatch, useStore } from "react-redux";
 import { setCurrentSubtitle, setCurrentTime, setVideoHeight } from "@/store/app/action";
 import { RootState } from "@/store";
@@ -104,11 +104,11 @@ const VideoJS: React.FC = () => {
 
   return (
     <div className="video-component" data-vjs-player>
-      <MeasureHeight onHeightChange={(height: number) => {
+      <MeasureSize onHeightChange={(height: number) => {
         dispatch(setVideoHeight(height))
       }}>
         <div ref={videoRef} />
-      </MeasureHeight>
+      </MeasureSize>
     </div>
   );
 };

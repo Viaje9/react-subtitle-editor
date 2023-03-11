@@ -1,7 +1,8 @@
 import { AppState } from "@/models/app-state";
 import { Subtitle } from "@/models/subtitle";
+import { convertTimeToSeconds } from "@/utils/time-helper";
 import { createReducer, PayloadAction } from "@reduxjs/toolkit";
-import { initSubtitle, setCurrentSubtitle, setCurrentTime, setVideoHeight } from "./action";
+import { editorSubtitle, initSubtitle, setCurrentSubtitle, setCurrentTime, setVideoHeight } from "./action";
 import { InitSubtitle } from "./model";
 
 const initialState: AppState = {
@@ -28,6 +29,13 @@ export const AppReducer = createReducer(initialState, (builder) => {
   })
   builder.addCase(setCurrentSubtitle, (state, action: PayloadAction<Subtitle>) => {
     state.currentSubtitle = action.payload
+  })
+  builder.addCase(editorSubtitle, (state, action: PayloadAction<Subtitle>) => {
+    state.subtitleList = state.subtitleList
+      .map(subtitle => (subtitle.number === action.payload.number ? { ...action.payload } : subtitle))
+      .sort((a, b) => convertTimeToSeconds(a.startTime) - convertTimeToSeconds(b.startTime))
+      .map((subtitle, i) => ({ ...subtitle, number: i + 1 }))
+
   })
   builder.addDefaultCase(() => ({ ...initialState }));
 });

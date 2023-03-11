@@ -70,7 +70,7 @@ function SubtitleItem({ subtitle, currentNumber }: SubtitleItemProps) {
       </InputGroup>
       <InputGroup className="timeInput p-1 me-1">
         <InputGroup.Text className="p-1">End</InputGroup.Text>
-        <Form.Control className="p-1" disabled={buttonStatus === Status.CONFIRM} type="number" step="0.1" defaultValue={convertTimeToSeconds(subtitle.startTime)} />
+        <Form.Control className="p-1" disabled={buttonStatus === Status.CONFIRM} type="number" step="0.1" defaultValue={convertTimeToSeconds(subtitle.endTime)} />
       </InputGroup>
       <InputGroup>
         <Form.Control disabled={buttonStatus === Status.CONFIRM} value={text} onChange={onSubtitleChange} />

@@ -5,7 +5,7 @@ interface Props {
   onHeightChange?: (height: number) => void;
 }
 
-const MeasureHeight: React.FC<Props> = ({ children, onHeightChange }) => {
+const MeasureSize: React.FC<Props> = ({ children, onHeightChange }) => {
   const [height, setHeight] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -36,4 +36,4 @@ const MeasureHeight: React.FC<Props> = ({ children, onHeightChange }) => {
   );
 };
 
-export default MeasureHeight;
+export default MeasureSize;
