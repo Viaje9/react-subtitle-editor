@@ -5,4 +5,6 @@ export interface AppState {
   videoHeight: number
   currentTime: string
   currentSubtitle: Subtitle
+  played: boolean
+  editable: boolean
 }

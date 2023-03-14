@@ -23,6 +23,7 @@
     "react-bootstrap": "^2.7.2",
     "react-dom": "^18.2.0",
     "react-redux": "^8.0.5",
+    "redux-persist": "^6.0.0",
     "video.js": "^7.21.3",
     "videojs-youtube": "^2.6.1",
     "vite-plugin-eslint": "^1.8.1"

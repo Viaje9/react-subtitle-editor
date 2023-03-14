@@ -21,6 +21,10 @@ export function UploadComponent() {
         if (typeof e.target?.result === "string") {
           const subtitleList = srtToJson(e.target.result);
           dispatch(initSubtitle({ subtitleList }))
+          if( fileInputRef.current) {
+            fileInputRef.current.type = 'text'
+            fileInputRef.current.type = 'file'
+          }
         } else {
           alert('請傳入srt格式')
         }

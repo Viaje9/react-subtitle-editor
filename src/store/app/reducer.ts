@@ -2,7 +2,7 @@ import { AppState } from "@/models/app-state";
 import { Subtitle } from "@/models/subtitle";
 import { convertTimeToSeconds } from "@/utils/time-helper";
 import { createReducer, PayloadAction } from "@reduxjs/toolkit";
-import { editorSubtitle, initSubtitle, setCurrentSubtitle, setCurrentTime, setVideoHeight } from "./action";
+import { editorSubtitle, initSubtitle, setCurrentSubtitle, setCurrentTime, setEditable, setPlayed, setVideoHeight } from "./action";
 import { InitSubtitle } from "./model";
 
 const initialState: AppState = {
@@ -14,7 +14,9 @@ const initialState: AppState = {
     startTime: '',
     endTime: '',
     text: ''
-  }
+  },
+  played: false,
+  editable: false
 };
 
 export const AppReducer = createReducer(initialState, (builder) => {
@@ -29,6 +31,7 @@ export const AppReducer = createReducer(initialState, (builder) => {
   })
   builder.addCase(setCurrentSubtitle, (state, action: PayloadAction<Subtitle>) => {
     state.currentSubtitle = action.payload
+  
   })
   builder.addCase(editorSubtitle, (state, action: PayloadAction<Subtitle>) => {
     const newList = state.subtitleList
@@ -37,7 +40,12 @@ export const AppReducer = createReducer(initialState, (builder) => {
       .map((subtitle, i) => ({ ...subtitle, number: i + 1 }))
 
     state.subtitleList = newList
-
   })
-  builder.addDefaultCase(() => ({ ...initialState }));
+  builder.addCase(setPlayed, (state, action: PayloadAction<boolean>) => {
+    state.played = action.payload
+  })
+  builder.addCase(setEditable, (state, action: PayloadAction<boolean>) => {
+    state.editable = action.payload
+  })
+  builder.addDefaultCase(() => initialState);
 });

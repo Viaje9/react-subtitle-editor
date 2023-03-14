@@ -1,23 +1,61 @@
-import React, { useRef, useEffect, useCallback } from "react";
+import React, { useRef, useEffect, useCallback, useState } from "react";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
 import "@videojs/http-streaming";
 import "videojs-youtube/dist/Youtube.min.js";
 import './video.css';
 import MeasureSize from "@/components/ measure-size.component";
-import { useDispatch, useStore } from "react-redux";
-import { setCurrentSubtitle, setCurrentTime, setVideoHeight } from "@/store/app/action";
+import { useDispatch, useSelector, useStore } from "react-redux";
+import { setCurrentSubtitle, setCurrentTime, setPlayed, setVideoHeight } from "@/store/app/action";
 import { RootState } from "@/store";
 import { convertTimeToSeconds } from "@/utils/time-helper";
+import { SubtitleBoxComponent } from "../subtitle-box/subtitle-box.component";
+import { ChangeSizeInfo } from "@/models/change-size-info";
 
 
 const VideoJS: React.FC = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<any>();
   const store = useStore<RootState>()
   const dispatch = useDispatch()
+  const [width, setWidth] = useState(0)
+  const { editable } = useSelector((state: RootState) => state.app);
 
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (playerRef.current && !editable) {
+        const currentTime = playerRef.current.currentTime();
+
+        if (event.code === 'ArrowRight') {
+          const newTime = parseFloat((currentTime + 0.3).toFixed(3));
+          playerRef.current.currentTime(newTime)
+        }
+
+        if (event.code === 'ArrowLeft') {
+          const newTime = parseFloat((currentTime - 0.3).toFixed(3));
+          playerRef.current.currentTime(newTime)
+        }
+
+        if (event.code === 'Space') {
+          if (playerRef.current.paused()) {
+            playerRef.current.play()
+          }
+
+          if (!playerRef.current.paused()) {
+            playerRef.current.pause();
+          }
+        }
+
+      }
+
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [editable]);
 
   useEffect(() => {
     const options: videojs.PlayerOptions = {
@@ -32,6 +70,9 @@ const VideoJS: React.FC = () => {
           src: "https://www.youtube.com/watch?v=BdHaeczStRA",
         },
       ],
+      youtube: {
+        disablekb: 1
+      }
     };
 
     if (!playerRef.current) {
@@ -42,7 +83,9 @@ const VideoJS: React.FC = () => {
         videoRef.current.appendChild(videoElement);
       }
 
-      (playerRef.current = videojs(videoElement, options, () => {
+
+      (playerRef.current = videojs(videoElement, options, function () {
+        this.playbackRate(1);
         if (videoRef.current) {
           dispatch(setVideoHeight(videoRef.current.offsetHeight))
         }
@@ -93,7 +136,16 @@ const VideoJS: React.FC = () => {
   useEffect(() => {
     if (playerRef.current) {
       playerRef.current.on('timeupdate', handleTimeUpdate);
+      playerRef.current.on('play', () => {
+        dispatch(setPlayed(true))
+
+      })
+
+      playerRef.current.on('pause', () => {
+        dispatch(setPlayed(false))
+      })
     }
+
 
     return () => {
       if (playerRef.current) {
@@ -103,12 +155,14 @@ const VideoJS: React.FC = () => {
   }, [handleTimeUpdate]);
 
   return (
-    <div className="video-component" data-vjs-player>
-      <MeasureSize onHeightChange={(height: number) => {
-        dispatch(setVideoHeight(height))
+    <div ref={containerRef} className="video-component" data-vjs-player>
+      <MeasureSize onSizeChange={(changeSizeInfo: ChangeSizeInfo) => {
+        dispatch(setVideoHeight(changeSizeInfo.height))
+        setWidth(changeSizeInfo.width)
       }}>
         <div ref={videoRef} />
       </MeasureSize>
+      <SubtitleBoxComponent parentRef={containerRef} parentWidth={width}></SubtitleBoxComponent>
     </div>
   );
 };
