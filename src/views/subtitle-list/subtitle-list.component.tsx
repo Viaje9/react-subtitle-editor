@@ -14,7 +14,13 @@ export function SubtitleListComponent() {
   return (
     <Card className="subtitleList" style={{ maxHeight: videoHeight }}>
       <ListGroup ref={listGroupRef} className="subtitleGroup">
-        {subtitleList.map((subtitle) => (<SubtitleItem key={subtitle.startTime} listGroupRef={listGroupRef} subtitle={subtitle} currentNumber={currentSubtitle.number} />))}
+        {subtitleList.map((subtitle) => (
+          <SubtitleItem
+            key={`${subtitle.text}-${subtitle.startTime}-${subtitle.endTime}`}
+            listGroupRef={listGroupRef}
+            subtitle={subtitle}
+            currentNumber={currentSubtitle.number}
+          />))}
       </ListGroup>
     </Card>
   )

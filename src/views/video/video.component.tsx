@@ -137,8 +137,7 @@ const VideoJS: React.FC = () => {
     if (playerRef.current) {
       playerRef.current.on('timeupdate', handleTimeUpdate);
       playerRef.current.on('play', () => {
-        dispatch(setPlayed(true))
-
+        dispatch(setPlayed(true))        
       })
 
       playerRef.current.on('pause', () => {
