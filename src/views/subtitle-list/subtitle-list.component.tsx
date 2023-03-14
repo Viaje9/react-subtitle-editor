@@ -1,6 +1,6 @@
 import { Subtitle } from "@/models/subtitle";
 import { RootState } from "@/store";
-import { editorSubtitle } from "@/store/app/action";
+import { editorSubtitle, removeSubtitle, setEditable } from "@/store/app/action";
 import { convertTimeToSeconds, formatTime } from "@/utils/time-helper";
 import { ChangeEvent, RefObject, useEffect, useRef, useState } from "react";
 import { Button, Card, Form, InputGroup, ListGroup } from "react-bootstrap";
@@ -78,6 +78,7 @@ function SubtitleItem({ subtitle, currentNumber, listGroupRef }: SubtitleItemPro
   const onStateButtonClick = () => {
     if (buttonStatus === Status.CONFIRM) {
       setButtonStatus(Status.EDIT)
+      dispatch(setEditable(true))
     }
 
     if (buttonStatus === Status.EDIT) {
@@ -96,7 +97,7 @@ function SubtitleItem({ subtitle, currentNumber, listGroupRef }: SubtitleItemPro
 
   return (
     <ListGroup.Item ref={listItemRef} className="subtitleItem d-flex" key={subtitle.number} variant={isCurrentSubtitle ? "primary" : ""} >
-      <div>
+      <div className="d-flex flex-column">
         <Button className="m-1 text-nowrap" onClick={onStateButtonClick} variant={buttonStatus === Status.CONFIRM ? "danger" : "primary"}>
           {
             (() => {
@@ -109,6 +110,7 @@ function SubtitleItem({ subtitle, currentNumber, listGroupRef }: SubtitleItemPro
             })()
           }
         </Button>
+        <RemoveButton number={subtitle.number}></RemoveButton>
       </div>
       <div className="d-flex flex-column">
         <div className="d-flex">
@@ -133,4 +135,22 @@ function SubtitleItem({ subtitle, currentNumber, listGroupRef }: SubtitleItemPro
   )
 }
 
+interface RemoveButtonProps {
+  number: number
+}
 
+function RemoveButton({ number }: RemoveButtonProps) {
+  const dispatch = useDispatch()
+
+  const handleClick = () => {
+    const result = confirm('確定刪除？')
+    if (result) {
+      dispatch(removeSubtitle(number))
+    }
+  }
+  return (
+    <Button className="m-1" onClick={handleClick}>
+      刪除
+    </Button>
+  )
+}

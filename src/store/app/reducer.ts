@@ -2,8 +2,8 @@ import { AppState } from "@/models/app-state";
 import { Subtitle } from "@/models/subtitle";
 import { convertTimeToSeconds } from "@/utils/time-helper";
 import { createReducer, PayloadAction } from "@reduxjs/toolkit";
-import { editorSubtitle, initSubtitle, setCurrentSubtitle, setCurrentTime, setEditable, setPlayed, setVideoHeight } from "./action";
-import { InitSubtitle } from "./model";
+import { addEmptySubtitle, editorSubtitle, initSubtitle, removeSubtitle, setCurrentSubtitle, setCurrentTime, setEditable, setPlayed, setVideoHeight } from "./action";
+import { InitSubtitle, StartTime } from "./model";
 
 const initialState: AppState = {
   subtitleList: [],
@@ -31,7 +31,7 @@ export const AppReducer = createReducer(initialState, (builder) => {
   })
   builder.addCase(setCurrentSubtitle, (state, action: PayloadAction<Subtitle>) => {
     state.currentSubtitle = action.payload
-  
+
   })
   builder.addCase(editorSubtitle, (state, action: PayloadAction<Subtitle>) => {
     const newList = state.subtitleList
@@ -47,5 +47,21 @@ export const AppReducer = createReducer(initialState, (builder) => {
   builder.addCase(setEditable, (state, action: PayloadAction<boolean>) => {
     state.editable = action.payload
   })
+  builder.addCase(addEmptySubtitle, (state, action: PayloadAction<StartTime>) => {
+    const subtitleItem: Subtitle = {
+      number: 999999,
+      startTime: action.payload.startTime + 1,
+      endTime: action.payload.startTime + 2,
+      text: '',
+    }
+    const newList = [...state.subtitleList, subtitleItem]
+      .sort((a, b) => convertTimeToSeconds(a.startTime) - convertTimeToSeconds(b.startTime))
+      .map((subtitle, i) => ({ ...subtitle, number: i + 1 }))
+    state.subtitleList = newList
+  })
+  builder.addCase(removeSubtitle, (state, action: PayloadAction<number>) => {
+    state.subtitleList = state.subtitleList.filter(({ number }) => number !== action.payload)
+  })
+
   builder.addDefaultCase(() => initialState);
 });
