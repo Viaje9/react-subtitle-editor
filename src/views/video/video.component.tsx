@@ -16,7 +16,7 @@ import { ChangeSizeInfo } from "@/models/change-size-info";
 const VideoJS: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLDivElement>(null);
-  const playerRef = useRef<any>();
+  const playerRef = useRef<videojs.Player>();
   const store = useStore<RootState>()
   const dispatch = useDispatch()
   const [width, setWidth] = useState(0)
@@ -29,12 +29,12 @@ const VideoJS: React.FC = () => {
         const currentTime = playerRef.current.currentTime();
 
         if (event.code === 'ArrowRight') {
-          const newTime = parseFloat((currentTime + 0.3).toFixed(3));
+          const newTime = parseFloat((currentTime + 1).toFixed(3));
           playerRef.current.currentTime(newTime)
         }
 
         if (event.code === 'ArrowLeft') {
-          const newTime = parseFloat((currentTime - 0.3).toFixed(3));
+          const newTime = parseFloat((currentTime - 1).toFixed(3));
           playerRef.current.currentTime(newTime)
         }
 
@@ -58,7 +58,7 @@ const VideoJS: React.FC = () => {
   }, [editable]);
 
   useEffect(() => {
-    const options: videojs.PlayerOptions = {
+    const options = {
       autoplay: false,
       controls: true,
       responsive: true,

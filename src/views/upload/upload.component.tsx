@@ -35,7 +35,7 @@ export function UploadComponent() {
   };
   
   return <>
-    <Button onClick={handleClick} variant="success">上傳</Button>
+    <Button className="me-1" onClick={handleClick} variant="success">上傳</Button>
     <input
       ref={fileInputRef}
       type="file"

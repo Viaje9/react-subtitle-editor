@@ -1,4 +1,5 @@
 import { RootState } from "@/store";
+import { convertTimeToSeconds } from "@/utils/time-helper";
 import { RefObject, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
@@ -9,11 +10,24 @@ interface SubtitleBoxProps {
 
 export function SubtitleBoxComponent({ parentRef, parentWidth }: SubtitleBoxProps) {
   const currentRef = useRef<HTMLDivElement>(null)
-  const { currentSubtitle } = useSelector((state: RootState) => state.app);
+  const { currentSubtitle, currentTime } = useSelector((state: RootState) => state.app);
   const [left, setLeft] = useState(0)
   const [bottom, setBottom] = useState(20)
   const [fontSize, setFontSize] = useState(16)
   const { editable } = useSelector((state: RootState) => state.app);
+  const [text, setText] = useState('')
+
+  useEffect(() => {
+    const startTime = convertTimeToSeconds(currentSubtitle.startTime)
+    const endTime = convertTimeToSeconds(currentSubtitle.endTime)
+    const newTime = parseFloat(currentTime)
+    if ((startTime < newTime) && (newTime < endTime)) {
+      setText(currentSubtitle.text)
+    } else {
+      setText('')
+    }
+
+  }, [text, currentSubtitle, currentTime])
 
   useEffect(() => {
     parentRef.current?.offsetWidth
@@ -23,7 +37,7 @@ export function SubtitleBoxComponent({ parentRef, parentWidth }: SubtitleBoxProp
       setLeft(parentX - currentX)
     }
 
-  }, [parentWidth, parentRef, currentRef, currentSubtitle.text, left, fontSize, bottom])
+  }, [parentWidth, parentRef, currentRef, left, fontSize, bottom, text])
 
   const styles = {
     position: 'absolute' as const,
@@ -71,7 +85,7 @@ export function SubtitleBoxComponent({ parentRef, parentWidth }: SubtitleBoxProp
   }, [fontSize, bottom, editable]);
 
   return (
-    <div ref={currentRef} style={styles} dangerouslySetInnerHTML={{ __html: currentSubtitle.text }}>
+    <div ref={currentRef} style={styles} dangerouslySetInnerHTML={{ __html: text }}>
     </div>
   )
 }

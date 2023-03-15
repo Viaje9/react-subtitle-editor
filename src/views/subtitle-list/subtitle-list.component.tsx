@@ -2,10 +2,11 @@ import { Subtitle } from "@/models/subtitle";
 import { RootState } from "@/store";
 import { editorSubtitle, removeSubtitle, setEditable } from "@/store/app/action";
 import { convertTimeToSeconds, formatTime } from "@/utils/time-helper";
-import { ChangeEvent, RefObject, useEffect, useRef, useState } from "react";
+import { ChangeEvent, RefObject, useEffect, useRef, useState, MouseEvent } from "react";
 import { Button, Card, Form, InputGroup, ListGroup } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import './subtitle-list.css'
+
 
 export function SubtitleListComponent() {
   const { subtitleList, currentSubtitle, videoHeight } = useSelector((state: RootState) => state.app);
@@ -75,7 +76,8 @@ function SubtitleItem({ subtitle, currentNumber, listGroupRef }: SubtitleItemPro
     }
   }
 
-  const onStateButtonClick = () => {
+  const onStateButtonClick = (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
     if (buttonStatus === Status.CONFIRM) {
       setButtonStatus(Status.EDIT)
       dispatch(setEditable(true))
