@@ -1,6 +1,6 @@
-import { Subtitle } from "@/models/subtitle";
+import { SubtitleInfo } from "@/models/subtitle";
 import { RootState } from "@/store";
-import { editorSubtitle, removeSubtitle, setEditable } from "@/store/app/action";
+import { changeSubtitleInfoEditable, editorSubtitle, onClickPlay, removeSubtitle, setEditable } from "@/store/app/action";
 import { convertTimeToSeconds, formatTime } from "@/utils/time-helper";
 import { ChangeEvent, RefObject, useEffect, useRef, useState, MouseEvent } from "react";
 import { Button, Card, Form, InputGroup, ListGroup } from "react-bootstrap";
@@ -28,21 +28,15 @@ export function SubtitleListComponent() {
 }
 
 interface SubtitleItemProps {
-  subtitle: Subtitle
+  subtitle: SubtitleInfo
   currentNumber: number
   listGroupRef: RefObject<HTMLDivElement>
-}
-
-enum Status {
-  EDIT,
-  CONFIRM
 }
 
 function SubtitleItem({ subtitle, currentNumber, listGroupRef }: SubtitleItemProps) {
   const [text, setText] = useState(subtitle.text)
   const [startTime, setStartTime] = useState(() => `${convertTimeToSeconds(subtitle.startTime)}`)
   const [endTime, setEndTime] = useState(() => `${convertTimeToSeconds(subtitle.endTime)}`)
-  const [buttonStatus, setButtonStatus] = useState<Status>(Status.CONFIRM)
   const dispatch = useDispatch()
   const isCurrentSubtitle = subtitle.number === currentNumber
   const listItemRef = useRef<HTMLAnchorElement>(null);
@@ -78,39 +72,35 @@ function SubtitleItem({ subtitle, currentNumber, listGroupRef }: SubtitleItemPro
 
   const onStateButtonClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
-    if (buttonStatus === Status.CONFIRM) {
-      setButtonStatus(Status.EDIT)
-      dispatch(setEditable(true))
+    if (!subtitle.editable) {
+      dispatch(onClickPlay({
+        pending: true,
+        played: false
+      }))
+      const subtitleInfo: SubtitleInfo = {
+        ...subtitle,
+        editable: true
+      }
+      dispatch(changeSubtitleInfoEditable(subtitleInfo))
     }
 
-    if (buttonStatus === Status.EDIT) {
-      setButtonStatus(Status.CONFIRM)
-      const subtitleInfo: Subtitle = {
+    if (subtitle.editable) {
+      const subtitleInfo: SubtitleInfo = {
         number: subtitle.number,
         text,
         startTime: formatTime(parseFloat(startTime)),
         endTime: formatTime(parseFloat(endTime)),
+        editable: false
       }
-
       dispatch(editorSubtitle(subtitleInfo))
-
     }
   }
 
   return (
     <ListGroup.Item ref={listItemRef} className="subtitleItem d-flex" key={subtitle.number} variant={isCurrentSubtitle ? "primary" : ""} >
       <div className="d-flex flex-column">
-        <Button className="m-1 text-nowrap" onClick={onStateButtonClick} variant={buttonStatus === Status.CONFIRM ? "danger" : "primary"}>
-          {
-            (() => {
-              switch (buttonStatus) {
-                case Status.CONFIRM:
-                  return '編輯'
-                case Status.EDIT:
-                  return '確認'
-              }
-            })()
-          }
+        <Button className="m-1 text-nowrap" onClick={onStateButtonClick} variant={!subtitle.editable ? "danger" : "primary"}>
+          {subtitle.editable ? '確認' : '編輯'}
         </Button>
         <RemoveButton number={subtitle.number}></RemoveButton>
       </div>
@@ -118,16 +108,16 @@ function SubtitleItem({ subtitle, currentNumber, listGroupRef }: SubtitleItemPro
         <div className="d-flex">
           <InputGroup className="timeInput p-1 me-1">
             <InputGroup.Text className="p-1">Start</InputGroup.Text>
-            <Form.Control className="p-1" disabled={buttonStatus === Status.CONFIRM} type="number" step="0.1" value={startTime} onChange={onStartTimeChange} />
+            <Form.Control className="p-1" disabled={!subtitle.editable} type="number" step="0.1" value={startTime} onChange={onStartTimeChange} />
           </InputGroup>
           <InputGroup className="timeInput p-1 me-1">
             <InputGroup.Text className="p-1">End</InputGroup.Text>
-            <Form.Control className="p-1" disabled={buttonStatus === Status.CONFIRM} type="number" step="0.1" value={endTime} onChange={onEndTimeChange} />
+            <Form.Control className="p-1" disabled={!subtitle.editable} type="number" step="0.1" value={endTime} onChange={onEndTimeChange} />
           </InputGroup>
         </div>
         <div className="ps-1">
           <InputGroup>
-            <Form.Control as="textarea" disabled={buttonStatus === Status.CONFIRM} value={text} onChange={onSubtitleChange} />
+            <Form.Control as="textarea" disabled={!subtitle.editable} value={text} onChange={onSubtitleChange} />
           </InputGroup>
         </div>
       </div>

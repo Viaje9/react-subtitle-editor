@@ -20,7 +20,7 @@ const VideoJS: React.FC = () => {
   const store = useStore<RootState>()
   const dispatch = useDispatch()
   const [width, setWidth] = useState(0)
-  const { editable, onClickPlayInfo } = useSelector((state: RootState) => state.app);
+  const { editable, onClickPlayInfo, currentTime } = useSelector((state: RootState) => state.app);
 
 
   useEffect(() => {
@@ -76,7 +76,7 @@ const VideoJS: React.FC = () => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [editable]);
+  }, [editable, currentTime]);
 
   useEffect(() => {
     const options = {
@@ -172,7 +172,7 @@ const VideoJS: React.FC = () => {
         playerRef.current.off('timeupdate', handleTimeUpdate);
       }
     };
-  }, [handleTimeUpdate]);
+  }, [handleTimeUpdate, dispatch]);
 
   return (
     <div ref={containerRef} className="video-component" data-vjs-player>

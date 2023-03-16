@@ -1,11 +1,11 @@
 import { RootState } from "@/store";
 import { addEmptySubtitle, editorSubtitle, onClickPlay, setEditable } from "@/store/app/action";
-import { formatTime } from "@/utils/time-helper";
-import { Alert, Button } from "react-bootstrap";
+import { convertTimeToSeconds, formatTime } from "@/utils/time-helper";
+import { Alert, Button, Form, InputGroup } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { DownloadComponent } from "../download/download.component";
 import { UploadComponent } from "../upload/upload.component";
-import { MouseEvent } from 'react';
+import { MouseEvent, useEffect, useState } from 'react';
 import './editor-bar.css'
 
 export function EditorBarComponent() {
@@ -24,6 +24,7 @@ export function EditorBarComponent() {
         <Alert className="ms-1 my-0 p-1">
           {(parseFloat(currentTime))}
         </Alert>
+
       </div>
       <div>
         <PlayButton></PlayButton>
@@ -34,15 +35,24 @@ export function EditorBarComponent() {
 
 
 function EditableButton() {
-  const { editable } = useSelector((state: RootState) => state.app);
+  const { editable, subtitleList } = useSelector((state: RootState) => state.app);
   const dispatch = useDispatch()
+  const [firstEditable, setFirstEditable] = useState('')
+
+  useEffect(() => {
+    const editableState = subtitleList.some((e) => e.editable)
+
+    if (editableState) {
+      const startTime = subtitleList.find(e => e.editable)?.startTime || ''
+      setFirstEditable(startTime)
+    }
+
+    dispatch(setEditable(editableState))
+  }, [editable, subtitleList, dispatch])
 
   return (
-    <Button className="ms-1" onClick={(event) => {
-      (event.target as any).blur()
-      event.preventDefault()
-      dispatch(setEditable(!editable))
-    }} variant={editable ? 'secondary' : 'warning'}>{editable ? '編輯裝態' : '播放狀態'}
+    <Button className="ms-1" variant={editable ? 'secondary' : 'warning'}>
+      {editable ? `編輯狀態 ${convertTimeToSeconds(firstEditable)}` : '播放狀態'}
     </Button>)
 }
 
@@ -81,3 +91,16 @@ function PlayButton() {
     </Button>
   )
 }
+
+
+// function FastForwardInput(params: type) {
+//   const { currentTime } = useSelector((state: RootState) => state.app);
+// 
+//   
+// 
+//   return (
+//     <InputGroup className="timeInput p-1 me-1">
+//       <Form.Control className="p-1" type="number" step="0.1" value={currentTime} onChange={onStartTimeChange} />
+//     </InputGroup>
+//   )
+// }
