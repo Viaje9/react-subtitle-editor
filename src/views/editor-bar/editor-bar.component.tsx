@@ -1,5 +1,5 @@
 import { RootState } from "@/store";
-import { addEmptySubtitle, editorSubtitle, setEditable } from "@/store/app/action";
+import { addEmptySubtitle, editorSubtitle, onClickPlay, setEditable } from "@/store/app/action";
 import { formatTime } from "@/utils/time-helper";
 import { Alert, Button } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,10 +11,8 @@ import './editor-bar.css'
 export function EditorBarComponent() {
   const { currentTime } = useSelector((state: RootState) => state.app);
 
-
-
   return (
-    <div className="p-2 d-flex justify-content-between">
+    <div className="p-2 d-flex justify-content-between text-nowrap">
       <div className="d-flex">
         <UploadComponent></UploadComponent>
         <DownloadComponent></DownloadComponent>
@@ -23,7 +21,7 @@ export function EditorBarComponent() {
         <Alert className="ms-1 my-0 p-1 timeAlert">
           {formatTime(parseFloat(currentTime))}
         </Alert>
-        <Alert className="ms-1 my-0 p-1 timeAlert">
+        <Alert className="ms-1 my-0 p-1">
           {(parseFloat(currentTime))}
         </Alert>
       </div>
@@ -66,13 +64,20 @@ function AddButton() {
 }
 
 function PlayButton() {
-  const handleClick = () => {
-    console.log(2123);
+  const { played } = useSelector((state: RootState) => state.app);
+  const dispatch = useDispatch()
 
-  }
   return (
-    <Button  variant="success" className="ms-1" onClick={handleClick}>
-      播放
+    <Button variant={played ? 'danger' : "success"} className="ms-1" onClick={(e) => {
+      (e.target as any).blur()
+      e.preventDefault()
+
+      dispatch(onClickPlay({
+        pending: true,
+        played: !played
+      }))
+    }}>
+      {played ? '暫停' : '播放'}
     </Button>
   )
 }

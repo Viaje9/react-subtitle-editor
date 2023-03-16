@@ -6,7 +6,7 @@ import "videojs-youtube/dist/Youtube.min.js";
 import './video.css';
 import MeasureSize from "@/components/ measure-size.component";
 import { useDispatch, useSelector, useStore } from "react-redux";
-import { setCurrentSubtitle, setCurrentTime, setPlayed, setVideoHeight } from "@/store/app/action";
+import { onClickPlay, setCurrentSubtitle, setCurrentTime, setPlayed, setVideoHeight } from "@/store/app/action";
 import { RootState } from "@/store";
 import { convertTimeToSeconds } from "@/utils/time-helper";
 import { SubtitleBoxComponent } from "../subtitle-box/subtitle-box.component";
@@ -20,7 +20,28 @@ const VideoJS: React.FC = () => {
   const store = useStore<RootState>()
   const dispatch = useDispatch()
   const [width, setWidth] = useState(0)
-  const { editable } = useSelector((state: RootState) => state.app);
+  const { editable, onClickPlayInfo } = useSelector((state: RootState) => state.app);
+
+
+  useEffect(() => {
+    if (playerRef.current) {
+
+      if (onClickPlayInfo.pending) {
+        if (onClickPlayInfo.played) {
+          playerRef.current.play()
+        }
+
+        if (!onClickPlayInfo.played) {
+          playerRef.current.pause();
+        }
+        dispatch(onClickPlay({
+          pending: false,
+          played: onClickPlayInfo.played
+        }))
+      }
+
+    }
+  }, [onClickPlayInfo, editable, dispatch])
 
 
   useEffect(() => {
@@ -137,7 +158,7 @@ const VideoJS: React.FC = () => {
     if (playerRef.current) {
       playerRef.current.on('timeupdate', handleTimeUpdate);
       playerRef.current.on('play', () => {
-        dispatch(setPlayed(true))        
+        dispatch(setPlayed(true))
       })
 
       playerRef.current.on('pause', () => {

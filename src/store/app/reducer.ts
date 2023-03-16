@@ -2,8 +2,8 @@ import { AppState } from "@/models/app-state";
 import { Subtitle } from "@/models/subtitle";
 import { convertTimeToSeconds } from "@/utils/time-helper";
 import { createReducer, PayloadAction } from "@reduxjs/toolkit";
-import { addEmptySubtitle, editorSubtitle, initSubtitle, removeSubtitle, setCurrentSubtitle, setCurrentTime, setEditable, setPlayed, setVideoHeight } from "./action";
-import { InitSubtitle, StartTime } from "./model";
+import { addEmptySubtitle, editorSubtitle, initSubtitle, onClickPlay, removeSubtitle, setCurrentSubtitle, setCurrentTime, setEditable, setPlayed, setVideoHeight } from "./action";
+import { InitSubtitle, onClickPlayInfo, StartTime } from "./model";
 
 const initialState: AppState = {
   subtitleList: [],
@@ -16,7 +16,11 @@ const initialState: AppState = {
     text: ''
   },
   played: false,
-  editable: false
+  editable: false,
+  onClickPlayInfo: {
+    pending: false,
+    played: false
+  }
 };
 
 export const AppReducer = createReducer(initialState, (builder) => {
@@ -62,6 +66,8 @@ export const AppReducer = createReducer(initialState, (builder) => {
   builder.addCase(removeSubtitle, (state, action: PayloadAction<number>) => {
     state.subtitleList = state.subtitleList.filter(({ number }) => number !== action.payload)
   })
-
+  builder.addCase(onClickPlay, (state, action: PayloadAction<onClickPlayInfo>) => {
+    state.onClickPlayInfo = action.payload
+  })
   builder.addDefaultCase(() => initialState);
 });

@@ -1,3 +1,5 @@
+import { onClickPlayInfo } from '@/store/app/model';
+import { onClickPlay } from './../store/app/action';
 import { Subtitle } from "./subtitle";
 
 export interface AppState {
@@ -7,4 +9,5 @@ export interface AppState {
   currentSubtitle: Subtitle
   played: boolean
   editable: boolean
+  onClickPlayInfo: onClickPlayInfo
 }
