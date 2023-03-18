@@ -1,9 +1,9 @@
 import { AppState } from "@/models/app-state";
 import { SubtitleInfo } from "@/models/subtitle";
-import { convertTimeToSeconds } from "@/utils/time-helper";
+import { convertTimeToSeconds, formatTime } from "@/utils/time-helper";
 import { createReducer, PayloadAction } from "@reduxjs/toolkit";
-import { addEmptySubtitle, changeSubtitleInfoEditable, editorSubtitle, initSubtitle, onClickPlay, removeSubtitle, setCurrentSubtitle, setCurrentTime, setEditable, setPlayed, setVideoHeight } from "./action";
-import { InitSubtitle, onClickPlayInfo, StartTime } from "./model";
+import { addEmptySubtitle, changeSubtitleInfoEditable, editorFontInfo, editorSubtitle, initSubtitle, onClickPlay, removeSubtitle, setCurrentSubtitle, setCurrentTime, setEditable, setPlayed, setVideoHeight } from "./action";
+import { FontInfo, InitSubtitle, onClickPlayInfo, StartTime } from "./model";
 
 const initialState: AppState = {
   subtitleList: [],
@@ -21,6 +21,11 @@ const initialState: AppState = {
   onClickPlayInfo: {
     pending: false,
     played: false
+  },
+  fontInfo: {
+    left: 0,
+    bottom: 20,
+    fontSize: 16
   }
 };
 
@@ -53,10 +58,12 @@ export const AppReducer = createReducer(initialState, (builder) => {
     state.editable = action.payload
   })
   builder.addCase(addEmptySubtitle, (state, action: PayloadAction<StartTime>) => {
+    const startTime = formatTime(convertTimeToSeconds(action.payload.startTime))
+    const endTime = formatTime(convertTimeToSeconds(action.payload.startTime) + 2)
     const subtitleItem: SubtitleInfo = {
       number: 999999,
-      startTime: action.payload.startTime + 1,
-      endTime: action.payload.startTime + 2,
+      startTime,
+      endTime,
       text: '',
       editable: true
     }
@@ -76,5 +83,11 @@ export const AppReducer = createReducer(initialState, (builder) => {
       .map(subtitle => (subtitle.number === action.payload.number ? { ...action.payload } : subtitle))
     state.subtitleList = newList
   })
+  builder.addCase(editorFontInfo, (state, action: PayloadAction<FontInfo>) => {
+    state.fontInfo = action.payload
+  })
+
+
+
   builder.addDefaultCase(() => initialState);
 });

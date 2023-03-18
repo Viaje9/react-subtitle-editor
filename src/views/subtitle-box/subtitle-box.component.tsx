@@ -1,7 +1,8 @@
 import { RootState } from "@/store";
+import { editorFontInfo } from "@/store/app/action";
 import { convertTimeToSeconds } from "@/utils/time-helper";
 import { RefObject, useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 interface SubtitleBoxProps {
   parentRef: RefObject<HTMLDivElement>
@@ -10,12 +11,27 @@ interface SubtitleBoxProps {
 
 export function SubtitleBoxComponent({ parentRef, parentWidth }: SubtitleBoxProps) {
   const currentRef = useRef<HTMLDivElement>(null)
-  const { currentSubtitle, currentTime } = useSelector((state: RootState) => state.app);
-  const [left, setLeft] = useState(0)
-  const [bottom, setBottom] = useState(20)
-  const [fontSize, setFontSize] = useState(16)
-  const { editable } = useSelector((state: RootState) => state.app);
+  const { editable, currentSubtitle, currentTime, fontInfo: { bottom, left, fontSize } } = useSelector((state: RootState) => state.app);
+  // const [left, setLeft] = useState(0)
+  // const [bottom, setBottom] = useState(20)
+  // const [fontSize, setFontSize] = useState(16)
   const [text, setText] = useState('')
+  const dispatch = useDispatch()
+
+
+  const styles = {
+    position: 'absolute' as const,
+    bottom: bottom,
+    left: left,
+    'zIndex': '99999',
+    'backgroundColor': 'rgba(0, 0, 0)',
+    color: 'white',
+    padding: '5px',
+    'borderRadius': '5px',
+    'textAlign': 'center' as const,
+    'fontSize': fontSize
+  };
+
 
   useEffect(() => {
     const startTime = convertTimeToSeconds(currentSubtitle.startTime)
@@ -34,47 +50,39 @@ export function SubtitleBoxComponent({ parentRef, parentWidth }: SubtitleBoxProp
     if (currentRef.current && parentRef.current) {
       const parentX = parentWidth / 2
       const currentX = currentRef.current.offsetWidth / 2
-      setLeft(parentX - currentX)
+      const newLeft = parentX - currentX
+      dispatch(editorFontInfo({ bottom, fontSize, left: newLeft }))
     }
 
-  }, [parentWidth, parentRef, currentRef, left, fontSize, bottom, text])
-
-  const styles = {
-    position: 'absolute' as const,
-    bottom: bottom,
-    left: left,
-    'zIndex': '99999',
-    'backgroundColor': 'rgba(0, 0, 0)',
-    color: 'white',
-    padding: '5px',
-    'borderRadius': '5px',
-    'textAlign': 'center' as const,
-    'fontSize': fontSize
-  };
-
-
+  }, [parentWidth, parentRef, currentRef, text, left, dispatch, fontSize, bottom])
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (!editable) {
         if (event.code === 'KeyE') {
           const newFontSize = fontSize + 1
-          setFontSize(newFontSize)
+          if (newFontSize > 0) {
+            dispatch(editorFontInfo({ bottom, left, fontSize: newFontSize }))
+          }
+
         }
 
         if (event.code === 'KeyQ') {
           const newFontSize = fontSize - 1
-          setFontSize(newFontSize)
+          if (newFontSize > 0) {
+            dispatch(editorFontInfo({ bottom, left, fontSize: newFontSize }))
+          }
         }
 
         if (event.code === 'KeyW') {
           const newBottom = bottom + 1
-          setBottom(newBottom)
+          dispatch(editorFontInfo({ fontSize, left, bottom: newBottom }))
+
         }
 
         if (event.code === 'KeyS') {
           const newBottom = bottom - 1
-          setBottom(newBottom)
+          dispatch(editorFontInfo({ fontSize, left, bottom: newBottom }))
         }
       }
     };
@@ -82,7 +90,7 @@ export function SubtitleBoxComponent({ parentRef, parentWidth }: SubtitleBoxProp
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [fontSize, bottom, editable]);
+  }, [fontSize, bottom, editable, dispatch, left]);
 
   return (
     <div ref={currentRef} style={styles} dangerouslySetInnerHTML={{ __html: text }}>

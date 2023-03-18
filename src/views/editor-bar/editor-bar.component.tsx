@@ -5,8 +5,9 @@ import { Alert, Button, Form, InputGroup } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { DownloadComponent } from "../download/download.component";
 import { UploadComponent } from "../upload/upload.component";
-import { MouseEvent, useEffect, useState } from 'react';
+import { MouseEvent, useContext, useEffect, useState } from 'react';
 import './editor-bar.css'
+import { VideoContext } from "../app/app";
 
 export function EditorBarComponent() {
   const { currentTime } = useSelector((state: RootState) => state.app);
@@ -18,15 +19,15 @@ export function EditorBarComponent() {
         <DownloadComponent></DownloadComponent>
         <EditableButton></EditableButton>
         <AddButton></AddButton>
-        <Alert className="ms-1 my-0 p-1 timeAlert">
+        <Alert className="ms-1 my-0 timeAlert">
           {formatTime(parseFloat(currentTime))}
-        </Alert>
-        <Alert className="ms-1 my-0 p-1">
+          <br />
           {(parseFloat(currentTime))}
         </Alert>
-
+        <FastForwardInput></FastForwardInput>
       </div>
-      <div>
+      <div className="d-flex">
+        <ControlsButton></ControlsButton>
         <PlayButton></PlayButton>
       </div>
     </div>
@@ -52,7 +53,7 @@ function EditableButton() {
 
   return (
     <Button className="ms-1" variant={editable ? 'secondary' : 'warning'}>
-      {editable ? `編輯狀態 ${convertTimeToSeconds(firstEditable)}` : '播放狀態'}
+      {editable ? `編輯 ${convertTimeToSeconds(firstEditable)}` : '播放'}
     </Button>)
 }
 
@@ -61,8 +62,9 @@ function AddButton() {
   const dispatch = useDispatch()
 
   const handleClick = () => {
+    // const endTime = parseFloat((convertTimeToSeconds(currentSubtitle.endTime) - 0.01).toFixed(3))
     dispatch(addEmptySubtitle({
-      startTime: currentSubtitle.startTime,
+      startTime: currentSubtitle.endTime,
     }))
   }
 
@@ -93,14 +95,36 @@ function PlayButton() {
 }
 
 
-// function FastForwardInput(params: type) {
-//   const { currentTime } = useSelector((state: RootState) => state.app);
-// 
-//   
-// 
-//   return (
-//     <InputGroup className="timeInput p-1 me-1">
-//       <Form.Control className="p-1" type="number" step="0.1" value={currentTime} onChange={onStartTimeChange} />
-//     </InputGroup>
-//   )
-// }
+function FastForwardInput() {
+  const [time, setTime] = useState('')
+  const { handleEvent } = useContext(VideoContext)
+
+  return (
+    <InputGroup className="fstForwardInput p-1 me-1">
+      <Form.Control type="number" inputMode="decimal" step="0.1" value={time} onChange={(e) => { setTime(e.target.value) }} />
+      <Button onClick={() => {
+        handleEvent(parseFloat(time))
+      }}>更新</Button>
+    </InputGroup>
+  )
+}
+
+function ControlsButton() {
+  const { currentTime } = useSelector((state: RootState) => state.app);
+  const { handleEvent } = useContext(VideoContext)
+
+  return (
+    <InputGroup className="p-1 me-1">
+      <Button onClick={(e) => {
+        (e.target as any).blur()
+        e.preventDefault()
+        handleEvent(parseFloat(currentTime) - 0.05)
+      }}>倒轉</Button>
+      <Button onClick={(e) => {
+        (e.target as any).blur()
+        e.preventDefault()
+        handleEvent(parseFloat(currentTime) + 0.05)
+      }}>快轉</Button>
+    </InputGroup>
+  )
+}

@@ -1,8 +1,7 @@
-import { onClickPlay } from './action';
-import { Subtitle } from "@/models/subtitle";
+import { SubtitleInfo } from "@/models/subtitle";
 
 export interface  InitSubtitle {
-  subtitleList: Subtitle[]
+  subtitleList: SubtitleInfo[]
 }
 
 export interface StartTime {
@@ -12,4 +11,10 @@ export interface StartTime {
 export interface onClickPlayInfo {
   pending: boolean
   played: boolean
+}
+
+export interface FontInfo {
+  left: number
+  bottom: number
+  fontSize: number
 }

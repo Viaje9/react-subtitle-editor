@@ -51,26 +51,21 @@ function SubtitleItem({ subtitle, currentNumber, listGroupRef }: SubtitleItemPro
 
   const onSubtitleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
-    if (value) {
-      setText(value)
-    }
+    setText(value)
   }
 
   const onStartTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
-    if (value) {
-      setStartTime(value)
-    }
+    setStartTime(value)
   }
 
   const onEndTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value
-    if (value) {
-      setEndTime(value)
-    }
+    setEndTime(value)
   }
 
   const onStateButtonClick = (e: MouseEvent<HTMLButtonElement>) => {
+    (e.target as any).blur()
     e.preventDefault()
     if (!subtitle.editable) {
       dispatch(onClickPlay({

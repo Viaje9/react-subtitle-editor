@@ -1,6 +1,6 @@
 import { SubtitleInfo } from "@/models/subtitle";
 import { createAction } from "@reduxjs/toolkit";
-import { InitSubtitle, onClickPlayInfo, StartTime } from "./model";
+import { FontInfo, InitSubtitle, onClickPlayInfo, StartTime } from "./model";
 
 export const initSubtitle = createAction<InitSubtitle>("app/initSubtitle")
 export const setVideoHeight = createAction<number>("app/setVideoHeight")
@@ -13,4 +13,5 @@ export const addEmptySubtitle = createAction<StartTime>("app/addEmptySubtitle")
 export const removeSubtitle = createAction<number>("app/removeSubtitle")
 export const onClickPlay = createAction<onClickPlayInfo>("app/onClickPlay")
 export const changeSubtitleInfoEditable = createAction<SubtitleInfo>("app/changeSubtitleInfoEditable")
+export const editorFontInfo = createAction<FontInfo>("app/editorFontInfo")
 

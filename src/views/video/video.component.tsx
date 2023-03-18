@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useCallback, useState } from "react";
+import React, { useRef, useEffect, useCallback, useState, createContext, useContext } from "react";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
 import "@videojs/http-streaming";
@@ -11,7 +11,15 @@ import { RootState } from "@/store";
 import { convertTimeToSeconds } from "@/utils/time-helper";
 import { SubtitleBoxComponent } from "../subtitle-box/subtitle-box.component";
 import { ChangeSizeInfo } from "@/models/change-size-info";
+import { VideoContext } from "../app/app";
 
+
+export const useSetHandleEvent = (handleEvent: (current:number) => void) => {
+  const { setHandleEvent } = useContext(VideoContext)
+  useEffect(() => {
+    setHandleEvent(() => handleEvent)
+  }, [])
+}
 
 const VideoJS: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -21,6 +29,14 @@ const VideoJS: React.FC = () => {
   const dispatch = useDispatch()
   const [width, setWidth] = useState(0)
   const { editable, onClickPlayInfo, currentTime } = useSelector((state: RootState) => state.app);
+
+  const handleContextCallbackEvent = (currentTime:number) => {
+    if (playerRef.current && currentTime) {
+      playerRef.current.currentTime(currentTime)
+    }
+  }
+
+  useSetHandleEvent(handleContextCallbackEvent)
 
 
   useEffect(() => {
@@ -50,22 +66,26 @@ const VideoJS: React.FC = () => {
         const currentTime = playerRef.current.currentTime();
 
         if (event.code === 'ArrowRight') {
-          const newTime = parseFloat((currentTime + 1).toFixed(3));
+          const newTime = parseFloat((currentTime + 0.2).toFixed(3));
           playerRef.current.currentTime(newTime)
+          return
         }
 
         if (event.code === 'ArrowLeft') {
-          const newTime = parseFloat((currentTime - 1).toFixed(3));
+          const newTime = parseFloat((currentTime - 0.2).toFixed(3));
           playerRef.current.currentTime(newTime)
+          return
         }
 
         if (event.code === 'Space') {
           if (playerRef.current.paused()) {
             playerRef.current.play()
+            return
           }
 
           if (!playerRef.current.paused()) {
             playerRef.current.pause();
+            return
           }
         }
 
@@ -84,11 +104,12 @@ const VideoJS: React.FC = () => {
       controls: true,
       responsive: true,
       fluid: true,
-      techOrder: ["youtube"],
+      // techOrder: ["youtube"],
       sources: [
         {
-          type: "video/youtube",
-          src: "https://www.youtube.com/watch?v=BdHaeczStRA",
+          // type: "video/youtube",
+          type: 'video/mp4',
+          src: "/videos/Mina Okabe - Every Second (Lyric Video).mp4",
         },
       ],
       youtube: {
@@ -158,10 +179,12 @@ const VideoJS: React.FC = () => {
     if (playerRef.current) {
       playerRef.current.on('timeupdate', handleTimeUpdate);
       playerRef.current.on('play', () => {
+        handleTimeUpdate()
         dispatch(setPlayed(true))
       })
 
       playerRef.current.on('pause', () => {
+        handleTimeUpdate()
         dispatch(setPlayed(false))
       })
     }
